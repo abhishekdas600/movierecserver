@@ -14,7 +14,7 @@ import (
 )
 
 const (
-	key    = "moviereccomendation"
+	key    = ""
 	MaxAge = 86400 * 30
 	IsProd = false
 )
