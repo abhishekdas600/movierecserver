@@ -1,0 +1,12 @@
+# Environment variables
+.env
+
+# Air files
+air.log
+.air
+
+# Database files (if any)
+db/
+
+# Temporary files
+tmp/
