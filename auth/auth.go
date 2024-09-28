@@ -13,8 +13,8 @@ import (
 	"github.com/markbates/goth/providers/google"
 )
 
-const (
-	key    = "moviereccomendation"
+var (
+	key    = os.Getenv("AUTH_KEY")
 	MaxAge = 86400 * 30
 	IsProd = false
 )

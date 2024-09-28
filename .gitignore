@@ -5,8 +5,6 @@
 air.log
 .air
 
-# Database files (if any)
-db/
 
 # Temporary files
 tmp/
