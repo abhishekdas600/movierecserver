@@ -38,7 +38,7 @@ func GetUserFavourites(c *gin.Context) {
 	c.JSON(http.StatusOK, favourites)
 }
 
-func getFavouritesByUserID(db *sql.DB, userID int) ([]models.Watchlist, error) {
+func getFavouritesByUserID(db *sql.DB, userID int) ([]models.Favourites, error) {
 	query := `SELECT id, user_id, tmdb_id, created_at FROM favourites WHERE user_id = $1`
 	rows, err := db.Query(query, userID)
 	if err != nil {
@@ -46,13 +46,13 @@ func getFavouritesByUserID(db *sql.DB, userID int) ([]models.Watchlist, error) {
 	}
 	defer rows.Close()
 
-	var favourites []models.Watchlist
+	var favourites []models.Favourites
 	for rows.Next() {
-		var wl models.Watchlist
-		if err := rows.Scan(&wl.ID, &wl.UserID, &wl.TMDBID, &wl.CreatedAt); err != nil {
+		var fv models.Favourites
+		if err := rows.Scan(&fv.ID, &fv.UserID, &fv.TMDBID, &fv.CreatedAt); err != nil {
 			return nil, err
 		}
-		favourites = append(favourites, wl)
+		favourites = append(favourites, fv)
 	}
 
 	if err := rows.Err(); err != nil {
@@ -84,7 +84,7 @@ func AddMovieToFavourites(c *gin.Context) {
 
 	db := c.MustGet("db").(*sql.DB) 
 
-	favouritesItem := models.Watchlist{
+	favouritesItem := models.Favourites{
 		UserID:   userID.(int),
 		TMDBID:   tmdbID, 
 		CreatedAt: time.Now(),
@@ -98,7 +98,7 @@ func AddMovieToFavourites(c *gin.Context) {
 
 	c.JSON(http.StatusOK, gin.H{"message": "Movie added to favourites successfully"})
 }
-func addMovieToFavourites(db *sql.DB, fv models.Watchlist) error {
+func addMovieToFavourites(db *sql.DB, fv models.Favourites) error {
 	query := `INSERT INTO favourites (user_id, tmdb_id, created_at) VALUES ($1, $2, $3)`
 	_, err := db.Exec(query, fv.UserID, fv.TMDBID, fv.CreatedAt)
 	return err
