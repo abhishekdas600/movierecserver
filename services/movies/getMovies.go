@@ -72,14 +72,14 @@ func GetGenres(c *gin.Context) {
 }
 
 func GetMoviesByFilter(c *gin.Context) {
-	apiKey := os.Getenv("TMDB_API_KEY")
+    apiKey := os.Getenv("TMDB_API_KEY")
     filter := c.Query("filter") 
     genres := c.Query("genres") 
     page := c.DefaultQuery("page", "1")
 
     var url string
 
-    baseURL := fmt.Sprintf("%s/discover/movie?api_key=%s&page=%s", baseURL, apiKey, page)
+    baseURL := fmt.Sprintf("%s/discover/movie?api_key=%s&page=%s",baseURL, apiKey, page)
 
     switch filter {
     case "top_rated":
