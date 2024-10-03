@@ -10,7 +10,7 @@ The application follows a layered architecture pattern:
 1. **Router Layer**: Handles incoming HTTP requests
 2. **Service Layer**: Implements core business logic
 3. **Model Layer**: Defines data structures
-4. **Database Layer**: Manages data persistence using PostgreSQL
+4. **Database Layer**: Manages data persistence using PostgreSQL and GORM
 
 ### Environment Variables
 
@@ -41,7 +41,7 @@ cp .env .env.local
 ### Running the Application
 
 1. Clone the repository:
-git clone https://github.com/your-username/movie-application.git
+git clone https://github.com/abhishekdas600/movierecserver.git
 
 2. Navigate to the project directory:
 cd movie-application
