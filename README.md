@@ -15,17 +15,17 @@ The application follows a layered architecture pattern:
 ### Environment Variables
 
 A template `.env` file is provided in the repository with the following variables:
-GOOGLE_CLIENT_ID=
-GOOGLE_CLIENT_SECRET=
-TMDB_API_KEY=
-AUTH_KEY=
-POSTGRES_DB=
-POSTGRES_USER=
-POSTGRES_PASSWORD=
-DB_HOST=
-DB_PORT=
-DB_SSLMODE=
-DB_TIMEZONE=
+GOOGLE_CLIENT_ID=""
+GOOGLE_CLIENT_SECRET=""
+TMDB_API_KEY=""
+AUTH_KEY=""
+POSTGRES_DB=""
+POSTGRES_USER=""
+POSTGRES_PASSWORD=""
+DB_HOST=""
+DB_PORT=""
+DB_SSLMODE=""
+DB_TIMEZONE=""
 
 To set up your environment:
 
