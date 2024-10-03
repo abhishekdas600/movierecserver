@@ -3,17 +3,15 @@ package models
 import "time"
 
 type Watchlist struct {
-	ID        int       `json:"id" db:"id"`                 
-	UserID    int       `json:"user_id" db:"user_id"`      
-	TMDBID    int       `json:"tmdb_id" db:"tmdb_id"`       
-	CreatedAt time.Time `json:"created_at" db:"created_at"` 
-
+	ID        int       `json:"id" gorm:"primaryKey"` 
+	UserID    int       `json:"user_id" gorm:"not null"`
+	TMDBID    int       `json:"tmdb_id" gorm:"not null"`
+	CreatedAt time.Time  `json:"created_at" gorm:"autoCreateTime"` 
 }
 
 type Favourites struct {
-	ID        int       `json:"id" db:"id"`                 
-	UserID    int       `json:"user_id" db:"user_id"`      
-	TMDBID    int       `json:"tmdb_id" db:"tmdb_id"`       
-	CreatedAt time.Time `json:"created_at" db:"created_at"` 
-
+	ID        int       `json:"id" gorm:"primaryKey"` 
+	UserID    int       `json:"user_id" gorm:"not null"`
+	TMDBID    int       `json:"tmdb_id" gorm:"not null"`
+	CreatedAt time.Time  `json:"created_at" gorm:"autoCreateTime"` 
 }

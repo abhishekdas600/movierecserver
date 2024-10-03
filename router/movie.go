@@ -17,4 +17,7 @@ func SetupMovieRouters(router *gin.Engine) {
 	router.GET("/recommendations", movies.GetRecommendations)
 	router.GET("/favourites", movies.GetUserFavourites)
 	router.POST("/addtofavourites/:tmdb_id", movies.AddMovieToFavourites)
+	router.POST("/removefromwatchlist/:tmdb_id", movies.RemoveMovieFromWatchlist)
+	router.POST("/removefromfavourites/:tmdb_id", movies.RemoveMovieFromFavourites)
+	router.GET("/moviesbygenre/:id", movies.GetMoviesByGenre)
 }

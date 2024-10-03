@@ -1,25 +1,24 @@
 package router
 
 import (
-	"context"
+	"errors"
 	"log"
-	"github.com/abhishekdas600/movierecserver/models"
 	"net/http"
 	"time"
 
-	"database/sql"
 	"github.com/abhishekdas600/movierecserver/db"
-
+	"github.com/abhishekdas600/movierecserver/models"
 	"github.com/gin-contrib/sessions"
 	"github.com/gin-gonic/gin"
 	"github.com/markbates/goth"
 	"github.com/markbates/goth/gothic"
+	"gorm.io/gorm"
 )
 
 func GetAuthCallbackFunction(r *gin.Engine) {
 	r.GET("/auth/:provider", beginAuthHandler)
 	r.GET("/auth/:provider/callback", HandleOAuthCallback)
-	r.GET("auth/logout", Logout)
+	r.GET("/auth/logout", Logout)
 }
 
 func beginAuthHandler(c *gin.Context) {
@@ -35,55 +34,53 @@ func HandleOAuthCallback(c *gin.Context) {
 	c.Request.URL.RawQuery = q.Encode()
 	user, err := gothic.CompleteUserAuth(c.Writer, c.Request)
 	if err != nil {
-		c.AbortWithError(http.StatusInternalServerError, err)
+		log.Printf("Failed to complete user authentication: %v", err)
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Authentication failed"})
 		return
 	}
-    
+
 	if err := processOAuthUser(c, user); err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		log.Printf("Error processing OAuth user: %v", err)
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Internal server error"})
 		return
 	}
-	
-	http.Redirect(c.Writer, c.Request, "http://localhost:8080", http.StatusFound)
+
+	http.Redirect(c.Writer, c.Request, "http://localhost:3000", http.StatusFound)
 }
 
 func processOAuthUser(c *gin.Context, user goth.User) error {
-	var dbConn *sql.DB
-	if err := db.InitializePostgreSQL(&dbConn); err != nil {
-		return err
-	}
-	defer dbConn.Close()
-
-	existingUser, err := getUserByEmail(dbConn, user.Email)
-	if err != nil {
+	
+	existingUser, err := getUserByEmail(user.Email)
+	if err != nil && !errors.Is(err, gorm.ErrRecordNotFound) {
 		return err
 	}
 
+	var userID int
 	if existingUser != nil {
 		log.Printf("User already exists: %s", existingUser.Email)
+		userID = existingUser.ID
 	} else {
+		
 		newUser := models.User{
 			Email:     user.Email,
-			Name: user.Name,
+			Name:      user.Name,
 			CreatedAt: time.Now(),
 		}
 
-
-		query := `INSERT INTO users (email, name, created_at) 
-				  VALUES ($1, $2, $3) RETURNING id`
-		var userID int
-		err = dbConn.QueryRow(query, newUser.Email, newUser.Name, newUser.CreatedAt).Scan(&userID)
-		if err != nil {
+		
+		if err := db.DB.Create(&newUser).Error; err != nil {
 			return err
 		}
-
-		
+		userID = newUser.ID
+		log.Printf("New user created with ID: %d", userID)
 	}
 
-	session := sessions.Default(c) 
+	
+	session := sessions.Default(c)
 	session.Set("email", user.Email)
 	session.Set("name", user.Name)
-	session.Set("logged_in", true) 
+	session.Set("user_id", userID)
+	session.Set("logged_in", true)
 
 	if err := session.Save(); err != nil {
 		return err
@@ -92,37 +89,23 @@ func processOAuthUser(c *gin.Context, user goth.User) error {
 	return nil
 }
 
-
-func getUserByEmail(dbConn *sql.DB, email string) (*models.User, error) {
-    var user models.User
-    ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
-    defer cancel()
-
-    stmt, err := dbConn.PrepareContext(ctx, "SELECT email, name, created_at FROM users WHERE email = $1")
-    if err != nil {
-        return nil, err
-    }
-    defer stmt.Close() 
-
-    err = stmt.QueryRowContext(ctx, email).Scan(&user.Email, &user.Name, &user.CreatedAt)
-    if err != nil {
-        if err == sql.ErrNoRows {
-            return nil, nil 
-        }
-        return nil, err
-    }
-
-    return &user, nil
+func getUserByEmail(email string) (*models.User, error) {
+	var user models.User
+	
+	if err := db.DB.Where("email = ?", email).First(&user).Error; err != nil {
+		return nil, err
+	}
+	return &user, nil
 }
 
 func Logout(c *gin.Context) {
-    session := sessions.Default(c)
-    session.Clear()
-    
-    if err := session.Save(); err != nil {
-        c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to log out"})
-        return
-    }
-    
-    c.JSON(http.StatusOK, gin.H{"message": "Successfully logged out"})
+	session := sessions.Default(c)
+	session.Clear()
+
+	if err := session.Save(); err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to log out"})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{"message": "Successfully logged out"})
 }

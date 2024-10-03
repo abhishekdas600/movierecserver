@@ -24,14 +24,24 @@ type GenreListResponse struct {
 	Genres []Genre `json:"genres"`
 }
 type MoviesFromId struct {
-	ID          int    `json:"id"`
-	Title       string `json:"title"`
-	Overview    string `json:"overview"`
-	PosterPath  string `json:"poster_path"`
-	Genres      []Genre `json:"genres"`
-	
+	ID          int      `json:"id"`
+	Title       string   `json:"title"`
+	Overview    string   `json:"overview"`
+	PosterPath  string   `json:"poster_path"`
+	Genres      []Genre  `json:"genres"`
+	ReleaseDate string   `json:"release_date"`
+	Status      string   `json:"status"`
+	VoteAverage float64  `json:"vote_average"`
+	Credits     Credits  `json:"credits"` 
 }
-
+type CastMember struct {
+	ID        int    `json:"id"`
+	Name      string `json:"name"`
+	Character string `json:"character"`
+}
+type Credits struct {
+	Cast []CastMember `json:"cast"`
+}
 type Trailer struct {
 	ID          string `json:"id"`
 	Name        string `json:"name"`
@@ -46,7 +56,12 @@ type Response struct {
 	Results []Trailer `json:"results"`
 }
 
-
+type MoviesByGenreResponse struct {
+	Page    int     `json:"page"`
+	Results []models.Movie `json:"results"`
+	TotalPages int  `json:"total_pages"`
+	TotalResults int `json:"total_results"`
+}
  
 
 const baseURL = "https://api.themoviedb.org/3"
@@ -279,7 +294,7 @@ func GetRecommendations(c *gin.Context) {
 		}
 
 		recommendations = append(recommendations, recResponse.Results...)
-		if len(recommendations) >= 20 {
+		if len(recommendations) >= 16 {
 			break 
 		}
 	}
@@ -289,4 +304,48 @@ func GetRecommendations(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusOK, gin.H{"recommendations": recommendations})
+}
+
+func GetMoviesByGenre(c *gin.Context) {
+	apiKey := os.Getenv("TMDB_API_KEY")
+	genreId := c.Param("id") 
+	limit := c.DefaultQuery("limit", "6") 
+
+	if genreId == "" {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "No genre ID found"})
+		return
+	}
+
+	
+	url := fmt.Sprintf("%s/discover/movie?api_key=%s&language=en-US&with_genres=%s&sort_by=popularity.desc&page=1", baseURL, apiKey, genreId)
+
+	resp, err := http.Get(url)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to fetch movies for the genre"})
+		return
+	}
+	defer resp.Body.Close()
+
+	if resp.StatusCode != http.StatusOK {
+		c.JSON(resp.StatusCode, gin.H{"error": "Failed to fetch movies from TMDB"})
+		return
+	}
+
+	var moviesResponse MoviesByGenreResponse
+	if err := json.NewDecoder(resp.Body).Decode(&moviesResponse); err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to decode movies response"})
+		return
+	}
+
+	
+	if len(moviesResponse.Results) > 0 {
+		limitInt, _ := strconv.Atoi(limit)
+		if limitInt > len(moviesResponse.Results) {
+			limitInt = len(moviesResponse.Results)
+		}
+		moviesResponse.Results = moviesResponse.Results[:limitInt]
+	}
+
+	
+	c.JSON(http.StatusOK, moviesResponse.Results)
 }
