@@ -1,0 +1,175 @@
+openapi: 3.0.0
+info:
+  title: User and Authentication API
+  description: API for user authentication and managing user details.
+  version: 1.0.0
+servers:
+  - url: http://localhost:8080
+paths:
+  /auth/{provider}:
+    get:
+      summary: Begin OAuth authentication
+      parameters:
+        - name: provider
+          in: path
+          required: true
+          description: The OAuth provider (e.g., google)
+          schema:
+            type: string
+            example: google
+      responses:
+        '302':
+          description: Redirect to OAuth provider for authentication
+
+  /auth/{provider}/callback:
+    get:
+      summary: Handle OAuth callback
+      parameters:
+        - name: provider
+          in: path
+          required: true
+          description: The OAuth provider (e.g., google)
+          schema:
+            type: string
+            example: google
+      responses:
+        '302':
+          description: Redirect back to application after successful authentication
+        '500':
+          description: Authentication failure
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    example: "Authentication failed"
+
+  /auth/logout:
+    get:
+      summary: Logout user and clear session
+      responses:
+        '200':
+          description: User logged out successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "Successfully logged out"
+        '500':
+          description: Logout failure
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    example: "Failed to log out"
+
+  /user/details:
+    get:
+      summary: Get user details
+      responses:
+        '200':
+          description: User details successfully retrieved
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+        '401':
+          description: User not logged in
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    example: "User not logged in"
+        '404':
+          description: User not found
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    example: "User not found"
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    example: "Failed to fetch user details"
+                  details:
+                    type: string
+                    example: "Error details here"
+
+components:
+  schemas:
+    User:
+      type: object
+      properties:
+        id:
+          type: integer
+          description: Unique identifier for the user
+          example: 123
+        name:
+          type: string
+          description: Name of the user
+          example: "John Doe"
+        email:
+          type: string
+          description: Email of the user
+          example: "john.doe@example.com"
+        watchlist:
+          type: array
+          description: List of user's watchlist movies
+          items:
+            $ref: '#/components/schemas/Watchlist'
+        favourites:
+          type: array
+          description: List of user's favourite movies
+          items:
+            $ref: '#/components/schemas/Favourites'
+        created_at:
+          type: string
+          format: date-time
+          description: Time when the user was created
+          example: "2023-10-01T12:34:56Z"
+
+    Watchlist:
+      type: object
+      properties:
+        tmdb_id:
+          type: integer
+          description: TMDB ID of the movie in the user's watchlist
+          example: 550
+        created_at:
+          type: string
+          format: date-time
+          description: Time when the movie was added to the watchlist
+          example: "2023-10-01T12:34:56Z"
+
+    Favourites:
+      type: object
+      properties:
+        tmdb_id:
+          type: integer
+          description: TMDB ID of the movie in the user's favourites
+          example: 680
+        created_at:
+          type: string
+          format: date-time
+          description: Time when the movie was added to favourites
+          example: "2023-10-01T12:34:56Z"

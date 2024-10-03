@@ -1,0 +1,351 @@
+openapi: 3.0.0
+info:
+  title: Movie Recommendation API
+  description: API for fetching movie details, genres, watchlists, and recommendations.
+  version: 1.0.0
+servers:
+  - url: http://localhost:8080
+paths:
+  /genres:
+    get:
+      summary: Get all genres
+      responses:
+        '200':
+          description: A list of genres
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GenreListResponse'
+  /movie/filter:
+    get:
+      summary: Get movies by filter
+      parameters:
+        - name: filter
+          in: query
+          required: true
+          description: Filter type (e.g., top_rated, recent, popular)
+          schema:
+            type: string
+        - name: genres
+          in: query
+          required: false
+          description: Comma-separated genre IDs
+          schema:
+            type: string
+        - name: page
+          in: query
+          required: false
+          description: Page number for pagination
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: A list of movies based on the filter
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MovieListResponse'
+  /movies/{id}:
+    get:
+      summary: Get movie details by ID
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: The ID of the movie
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Detailed information about the movie
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MoviesFromId'
+  /trailer/{id}:
+    get:
+      summary: Get trailers for a movie by ID
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: The ID of the movie
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: A list of trailers for the movie
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+  /watchlist:
+    get:
+      summary: Get user watchlist
+      responses:
+        '200':
+          description: The user's watchlist
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Watchlist'
+  /addwatchlist/{tmdb_id}:
+    post:
+      summary: Add a movie to the user's watchlist
+      parameters:
+        - name: tmdb_id
+          in: path
+          required: true
+          description: The TMDB ID of the movie
+          schema:
+            type: integer
+      responses:
+        '201':
+          description: Movie added to watchlist
+  /search:
+    get:
+      summary: Search for movies
+      parameters:
+        - name: query
+          in: query
+          required: true
+          description: The search query
+          schema:
+            type: string
+        - name: page
+          in: query
+          required: false
+          description: Page number for pagination
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: A list of search results
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MovieListResponse'
+  /recommendations:
+    get:
+      summary: Get movie recommendations based on search history
+      responses:
+        '200':
+          description: A list of recommended movies
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Movie'
+  /favourites:
+    get:
+      summary: Get user favourites
+      responses:
+        '200':
+          description: The user's favourites
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Favourites'
+  /addtofavourites/{tmdb_id}:
+    post:
+      summary: Add a movie to the user's favourites
+      parameters:
+        - name: tmdb_id
+          in: path
+          required: true
+          description: The TMDB ID of the movie
+          schema:
+            type: integer
+      responses:
+        '201':
+          description: Movie added to favourites
+  /removefromwatchlist/{tmdb_id}:
+    post:
+      summary: Remove a movie from the user's watchlist
+      parameters:
+        - name: tmdb_id
+          in: path
+          required: true
+          description: The TMDB ID of the movie
+          schema:
+            type: integer
+      responses:
+        '204':
+          description: Movie removed from watchlist
+  /removefromfavourites/{tmdb_id}:
+    post:
+      summary: Remove a movie from the user's favourites
+      parameters:
+        - name: tmdb_id
+          in: path
+          required: true
+          description: The TMDB ID of the movie
+          schema:
+            type: integer
+      responses:
+        '204':
+          description: Movie removed from favourites
+  /moviesbygenre/{id}:
+    get:
+      summary: Get movies by genre
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: The ID of the genre
+          schema:
+            type: integer
+        - name: limit
+          in: query
+          required: false
+          description: Optional limit of movies to return
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: A list of movies in the specified genre
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Movie'
+components:
+  schemas:
+    Genre:
+      type: object
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+    GenreListResponse:
+      type: object
+      properties:
+        genres:
+          type: array
+          items:
+            $ref: '#/components/schemas/Genre'
+    Movie:
+      type: object
+      properties:
+        id:
+          type: integer
+        title:
+          type: string
+        overview:
+          type: string
+        poster_path:
+          type: string
+        genre_ids:
+          type: array
+          items:
+            type: integer
+        genre_names:
+          type: array
+          items:
+            type: string
+    MovieListResponse:
+      type: object
+      properties:
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/Movie'
+        page:
+          type: integer
+        total_pages:
+          type: integer
+    MoviesFromId:
+      type: object
+      properties:
+        id:
+          type: integer
+        title:
+          type: string
+        overview:
+          type: string
+        poster_path:
+          type: string
+        genres:
+          type: array
+          items:
+            $ref: '#/components/schemas/Genre'
+        release_date:
+          type: string
+        status:
+          type: string
+        vote_average:
+          type: number
+          format: float
+        credits:
+          $ref: '#/components/schemas/Credits'
+    CastMember:
+      type: object
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+        character:
+          type: string
+    Credits:
+      type: object
+      properties:
+        cast:
+          type: array
+          items:
+            $ref: '#/components/schemas/CastMember'
+    Trailer:
+      type: object
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        key:
+          type: string
+        type:
+          type: string
+        official:
+          type: boolean
+        published_at:
+          type: string
+    Response:
+      type: object
+      properties:
+        id:
+          type: integer
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/Trailer'
+    Watchlist:
+      type: object
+      properties:
+        id:
+          type: integer
+        user_id:
+          type: integer
+        tmdb_id:
+          type: integer
+        created_at:
+          type: string
+          format: date-time
+    Favourites:
+      type: object
+      properties:
+        id:
+          type: integer
+        user_id:
+          type: integer
+        tmdb_id:
+          type: integer
+        created_at:
+          type: string
+          format: date-time
