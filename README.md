@@ -56,7 +56,9 @@ go run main.go
 
 ## API Documentation
 
-API documentation is available via the OpenAPI specification file (`openapi-movie-spec.yaml`: https://documenter.getpostman.com/view/29488004/2sAXxLCETq , `openapi-user-spec.yaml`: https://documenter.getpostman.com/view/29488004/2sAXxLCEmd ).
+API documentation is available via the OpenAPI specification file (
+`API documentation for Movie`: https://documenter.getpostman.com/view/29488004/2sAXxLCETq ,
+`API documentation for User`: https://documenter.getpostman.com/view/29488004/2sAXxLCEmd ).
 
 
 
