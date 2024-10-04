@@ -60,7 +60,9 @@ API documentation is available via the OpenAPI specification file (
 `API documentation for Movie`: https://documenter.getpostman.com/view/29488004/2sAXxLCETq ,
 `API documentation for User`: https://documenter.getpostman.com/view/29488004/2sAXxLCEmd ).
 
+## App explanation Video
 
+Video Link : https://www.loom.com/share/8904be4d0efc4989bf6f5470ae6a1c59?sid=fbd9d06c-149f-4ae0-bce5-e7aa7a07d7bc
 
 ## Acknowledgments
 
