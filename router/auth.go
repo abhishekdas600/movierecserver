@@ -45,7 +45,7 @@ func HandleOAuthCallback(c *gin.Context) {
 		return
 	}
 
-	http.Redirect(c.Writer, c.Request, "http://localhost:3000", http.StatusFound)
+	http.Redirect(c.Writer, c.Request, "https://movierec-client.vercel.app", http.StatusFound)
 }
 
 func processOAuthUser(c *gin.Context, user goth.User) error {

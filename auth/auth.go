@@ -1,21 +1,22 @@
 package auth
 
 import (
-    "log"
-    "os"
+	"log"
+	"net/http"
+	"os"
 
-    "github.com/gin-contrib/sessions"
-    "github.com/gin-contrib/sessions/cookie"
-    "github.com/gin-gonic/gin"
-    "github.com/joho/godotenv"
-    "github.com/markbates/goth"
-    "github.com/markbates/goth/gothic"
-    "github.com/markbates/goth/providers/google"
+	"github.com/gin-contrib/sessions"
+	"github.com/gin-contrib/sessions/cookie"
+	"github.com/gin-gonic/gin"
+	"github.com/joho/godotenv"
+	"github.com/markbates/goth"
+	"github.com/markbates/goth/gothic"
+	"github.com/markbates/goth/providers/google"
 )
 
 var (
     MaxAge = 86400 * 30 
-    IsProd = false      
+    IsProd = true   
 )
 
 func NewAuth(r *gin.Engine) {
@@ -40,6 +41,7 @@ func NewAuth(r *gin.Engine) {
         MaxAge:   MaxAge,
         HttpOnly: true,
         Secure:   IsProd,
+        SameSite: http.SameSiteNoneMode,
     })
 
     r.Use(sessions.Sessions("mysession", store))
