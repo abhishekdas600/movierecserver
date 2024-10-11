@@ -10,22 +10,22 @@ The application follows a layered architecture pattern:
 1. **Router Layer**: Handles incoming HTTP requests
 2. **Service Layer**: Implements core business logic
 3. **Model Layer**: Defines data structures
-4. **Database Layer**: Manages data persistence using PostgreSQL
+4. **Database Layer**: Manages data persistence using PostgreSQL and GORM
 
 ### Environment Variables
 
 A template `.env` file is provided in the repository with the following variables:
-GOOGLE_CLIENT_ID=
-GOOGLE_CLIENT_SECRET=
-TMDB_API_KEY=
-AUTH_KEY=
-POSTGRES_DB=
-POSTGRES_USER=
-POSTGRES_PASSWORD=
-DB_HOST=
-DB_PORT=
-DB_SSLMODE=
-DB_TIMEZONE=
+GOOGLE_CLIENT_ID=""
+GOOGLE_CLIENT_SECRET=""
+TMDB_API_KEY=""
+AUTH_KEY=""
+POSTGRES_DB=""
+POSTGRES_USER=""
+POSTGRES_PASSWORD=""
+DB_HOST=""
+DB_PORT=""
+DB_SSLMODE=""
+DB_TIMEZONE=""
 
 To set up your environment:
 
@@ -41,7 +41,7 @@ cp .env .env.local
 ### Running the Application
 
 1. Clone the repository:
-git clone https://github.com/your-username/movie-application.git
+git clone https://github.com/abhishekdas600/movierecserver.git
 
 2. Navigate to the project directory:
 cd movie-application
@@ -56,9 +56,13 @@ go run main.go
 
 ## API Documentation
 
-API documentation is available via the OpenAPI specification file (`openapi-movie-spec.yaml`, `openapi-user-spec.yaml`).
+API documentation is available via the OpenAPI specification file (
+`API documentation for Movie`: https://documenter.getpostman.com/view/29488004/2sAXxLCETq ,
+`API documentation for User`: https://documenter.getpostman.com/view/29488004/2sAXxLCEmd ).
 
+## App explanation Video
 
+Video Link : https://www.loom.com/share/8904be4d0efc4989bf6f5470ae6a1c59?sid=fbd9d06c-149f-4ae0-bce5-e7aa7a07d7bc
 
 ## Acknowledgments
 
